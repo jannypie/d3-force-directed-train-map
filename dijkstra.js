@@ -1,5 +1,3 @@
-
-
 /*
  * dijkstra.js
  *

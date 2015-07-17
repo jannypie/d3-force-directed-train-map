@@ -1,5 +1,9 @@
+// Author: Jan Dennison
+// July 2015
+// d3 Directional Force Map Construction
 
-// Responsive SVG setup
+// SVG setup
+//
 // To full width of viewport
 var width = document.documentElement.clientWidth,
   height = document.documentElement.clientHeight;
@@ -9,6 +13,7 @@ var svgContainer = d3.select('body').append('svg')
   .attr('height', height);
 
 // Use data provided to set up graph
+//
 // List all the cities
 var cities = ["frolia","hailea","hanalei","maeulia","hauauai","lainea","kaleola","lakua","paukaa","poipu","waimea"];
 // Populate nodes
@@ -94,6 +99,25 @@ var force = d3.layout.force()
 
 var drag = force.drag();
 
+// Lines and nodes setup
+//
+// Create a Group of link paths, markers and labels
+// Allows highlighting of hovered paths
+// Allows inheritance of stroke/fill color
+var linkGroup = svgContainer.selectAll('.linkGroup')
+  .data(links)
+  .enter().append('g')
+    .attr('class',function(d){
+      return d.source.name + "-to-" + d.target.name + " link-group";
+    });
+var link = linkGroup.append('line')
+    .attr('class', 'link');
+var linkTitle = linkGroup.append("text")
+    .attr('class', 'linkTitle')
+    .text(function(d) {
+      return d.distance + "mi";
+    });
+
 // Define arrow markers
 svgContainer.append("defs").selectAll("marker")
     .data(links)
@@ -102,32 +126,13 @@ svgContainer.append("defs").selectAll("marker")
     .attr("viewBox", "0 -5 10 10")
     .attr("refX", 15)
     .attr("refY", -0.5)
-    .attr("markerWidth", 6)
-    .attr("markerHeight", 6)
+    .attr("markerWidth", 4)
+    .attr("markerHeight", 4)
     .attr("orient", "auto")
   .append("path")
     .attr("d", "M0,-5L10,0L0,5");
 
-// Lines and nodes setup
-// Create a group of link paths, markers and labels
-// Allows highlighting of hovered paths
-// Allows inheritance of stroke/fill color
-var linkGroup = svgContainer.selectAll('.linkGroup')
-  .data(links)
-  .enter().append('g')
-    .attr('class','linkGroup')
-    .attr('class',function(d){
-      return d.source.name + "-to-" + d.target.name;
-    });
-var link = linkGroup.append('line')
-    .attr('class', 'link')
-    .attr("marker-end", "url(#arrow)");
-var linkTitle = linkGroup.append("text")
-    .attr('class', 'linkTitle')
-    .text(function(d) {
-      return d.distance + "mi";
-    });
-
+// Append nodes
 var node = svgContainer.selectAll('.node')
   .data(force.nodes())
   .enter().append("circle")
@@ -135,6 +140,7 @@ var node = svgContainer.selectAll('.node')
   .attr('class', 'node')
   .attr('fixed',false);
 
+// Append city titles to nodes
 var nodeTitle = svgContainer.selectAll('.nodeTitle')
   .data(force.nodes())
   .enter().append("text")
@@ -143,12 +149,12 @@ var nodeTitle = svgContainer.selectAll('.nodeTitle')
     return d.name;
   });
 
-// Link distances
+// Define link distances
 force.linkDistance(function(link) {
   return link.distance;
 });
 
-// Define callback function to populate data once complete
+// Populate data once force start is complete
 force.on('end', function() {
   link.attr('x1', function(d) { return d.source.x; })
       .attr('y1', function(d) { return d.source.y; })

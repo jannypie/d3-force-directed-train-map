@@ -1,35 +1,60 @@
 /* Styles */
 html {
-  background: url(ocean.jpg) no-repeat center center fixed;
+  background: url(background.jpg) no-repeat center center fixed;
   -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
   background-size: cover;
 }
 body {
-  color: #051A38;
-  font: sans-serif;
+  color: #4C668C;
+  font-family: sans-serif;
+}
+header {
+  position: absolute;
+  text-align: center;
+  width: 100%;
+}
+h1 {
+  margin-bottom: 0.5em;
+}
+p {
+  color: orangered;
 }
 /* d3 Map */
 svg {
   display: block;
   margin: 0 auto;
 }
-circle {
+.node {
   fill: #4C668C;
   stroke: #fff;
   stroke-width: 2px;
   cursor: pointer;
 }
-line {
+.link-group {
   stroke: #ccc;
-  stroke-width: 2px;
-}
-marker {
+  stroke-width: 3px;
   fill: #ccc;
 }
+.link-group text {
+  stroke: none;
+  fill: none;
+}
+.link-group:hover {
+  stroke: orangered;
+}
+.link-group:hover line {
+  marker-end: url(#arrow);
+}
+marker {
+  fill: orangered;
+}
+.link-group:hover text {
+  fill: orangered;
+}
 text {
-  font: 12px sans-serif;
+  font: 14px sans-serif;
   letter-spacing: 1px;
   pointer-events: none;
   text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, -1px 0 0 #fff;
@@ -38,7 +63,4 @@ text {
   fill: #142E54;
   text-anchor: middle;
   text-transform: uppercase;
-}
-.linkTitle {
-  fill: #758AA8;
 }
