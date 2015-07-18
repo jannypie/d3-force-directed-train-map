@@ -1,6 +1,6 @@
 // Author: Jan Dennison
 // July 2015
-// d3 Directional Force Map Construction
+// d3 Directional-Force Map
 
 // SVG setup
 //
@@ -14,99 +14,107 @@ var svgContainer = d3.select('body').append('svg')
 
 // Use data provided to set up graph
 //
-// List all the cities
+// List all the cities!
 var cities = ["frolia","hailea","hanalei","maeulia","hauauai","lainea","kaleola","lakua","paukaa","poipu","waimea"];
-// Populate nodes
+// Populate nodes as named objects
+// Allows easy city lookup when assigning distances
 var nodes = {};
 for (var i = 0; i < cities.length; i++) {
   nodes[cities[i]] = {"name": cities[i]};
 }
 // Populate links and assign distances
+// See how easy it is to define source/target cities!
 var links = [{
-    "source": nodes["frolia"],
-    "target": nodes["hailea"],
+    "source": nodes.frolia,
+    "target": nodes.hailea,
     "distance": 9
   }, {
-    "source": nodes["hailea"],
-    "target": nodes["hanalei"],
+    "source": nodes.hailea,
+    "target": nodes.hanalei,
     "distance": 5
   }, {
-    "source": nodes["hanalei"],
-    "target": nodes["maeulia"],
+    "source": nodes.hanalei,
+    "target": nodes.maeulia,
     "distance": 6
   }, {
-    "source": nodes["hauauai"],
-    "target": nodes["lainea"],
+    "source": nodes.hauauai,
+    "target": nodes.lainea,
     "distance": 8
   }, {
-    "source": nodes["kaleola"],
-    "target": nodes["maeulia"],
+    "source": nodes.kaleola,
+    "target": nodes.maeulia,
     "distance": 7
   }, {
-    "source": nodes["lainea"],
-    "target": nodes["hailea"],
+    "source": nodes.lainea,
+    "target": nodes.hailea,
     "distance": 5
   }, {
-    "source": nodes["lakua"],
-    "target": nodes["hauauai"],
+    "source": nodes.lakua,
+    "target": nodes.hauauai,
     "distance": 3
   }, {
-    "source": nodes["maeulia"],
-    "target": nodes["hailea"],
+    "source": nodes.maeulia,
+    "target": nodes.hailea,
     "distance": 12
   }, {
-    "source": nodes["paukaa"],
-    "target": nodes["hauauai"],
+    "source": nodes.paukaa,
+    "target": nodes.hauauai,
     "distance": 6
   }, {
-    "source": nodes["poipu"],
-    "target": nodes["paukaa"],
+    "source": nodes.poipu,
+    "target": nodes.paukaa,
     "distance": 9
   }, {
-    "source": nodes["hailea"],
-    "target": nodes["waimea"],
+    "source": nodes.hailea,
+    "target": nodes.waimea,
     "distance": 4
   }, {
-    "source": nodes["waimea"],
-    "target": nodes["lakua"],
+    "source": nodes.waimea,
+    "target": nodes.lakua,
     "distance": 9
   }, {
-    "source": nodes["lakua"],
-    "target": nodes["poipu"],
+    "source": nodes.lakua,
+    "target": nodes.poipu,
     "distance": 7
   }, {
-    "source": nodes["waimea"],
-    "target": nodes["kaleola"],
+    "source": nodes.waimea,
+    "target": nodes.kaleola,
     "distance": 4
   }, {
-    "source": nodes["maeulia"],
-    "target": nodes["paukaa"],
+    "source": nodes.maeulia,
+    "target": nodes.paukaa,
     "distance": 14
   }, {
-    "source": nodes["hailea"],
-    "target": nodes["lainea"],
+    "source": nodes.hailea,
+    "target": nodes.lainea,
     "distance": 8
   }];
 
 // Force setup
 // More info at https://github.com/mbostock/d3/wiki/Force-Layout
+// Wait to call .start() until nodes/links are set up
 var force = d3.layout.force()
   .size([width, height])
+  // Returns array of each city object
   .nodes(d3.values(nodes))
   .links(links)
   .charge(-document.documentElement.clientWidth * 5)
   .on("tick", handleTick);
 
+// Attach drag events
 var drag = force.drag();
 
 // Lines and nodes setup
 //
-// Create a Group of link paths, markers and labels
+// Creates a Group of link paths, markers, and labels
 // Allows highlighting of hovered paths
-// Allows inheritance of stroke/fill color
+// via inheritance of stroke/fill color
+// and hover event
 var linkGroup = svgContainer.selectAll('.linkGroup')
-  .data(links)
-  .enter().append('g')
+    .data(links)
+    .enter().append('g')
+    // Class name indicating city connections
+    // makes DOM markup more readable
     .attr('class',function(d){
       return d.source.name + "-to-" + d.target.name + " link-group";
     });
@@ -118,21 +126,21 @@ var linkTitle = linkGroup.append("text")
       return d.distance + "mi";
     });
 
-// Define arrow markers
+// Define directional arrow markers
 svgContainer.append("defs").selectAll("marker")
     .data(links)
-  .enter().append("marker")
-    .attr("id","arrow")
-    .attr("viewBox", "0 -5 10 10")
-    .attr("refX", 15)
-    .attr("refY", -0.5)
-    .attr("markerWidth", 4)
-    .attr("markerHeight", 4)
-    .attr("orient", "auto")
-  .append("path")
-    .attr("d", "M0,-5L10,0L0,5");
+    .enter().append("marker")
+      .attr("id","arrow")
+      .attr("viewBox", "0 -5 10 10")
+      .attr("refX", 15)
+      .attr("refY", -0.5)
+      .attr("markerWidth", 4)
+      .attr("markerHeight", 4)
+      .attr("orient", "auto")
+    .append("path")
+      .attr("d", "M0,-5L10,0L0,5");
 
-// Append nodes
+// Append nodes to graph
 var node = svgContainer.selectAll('.node')
   .data(force.nodes())
   .enter().append("circle")
@@ -149,12 +157,13 @@ var nodeTitle = svgContainer.selectAll('.nodeTitle')
     return d.name;
   });
 
-// Define link distances
+// Define individual link distances
 force.linkDistance(function(link) {
   return link.distance;
 });
 
-// Populate data once force start is complete
+// Populates element coordinates
+// Called after successful force.start()
 force.on('end', function() {
   link.attr('x1', function(d) { return d.source.x; })
       .attr('y1', function(d) { return d.source.y; })
@@ -166,8 +175,10 @@ force.on('end', function() {
       .call(drag);
 
   nodeTitle.attr("x", function(d) { return d.x; })
+      // Offset node title for readability
       .attr("y", function(d) { return d.y - 5; });
 
+  // Offset link titles for readability
   linkTitle.attr("x", function(d) { return (d.target.x + d.source.x) / 2 + 5; })
       .attr("y", function(d) { return (d.target.y + d.source.y) / 2 + 5; });
 });
