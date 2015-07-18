@@ -48,3 +48,5 @@
     - Only changes line color based on distance, doesn't actually return the shortest distance between nodes
   - [Simple Dijkstra Implementation in JavaScript](http://www.nealbohling.com/2014/05/dijkstra-javascript-d3-js/)
     - Was using this example to develop a recursive shortest-path approach of my own when I realized I had used up all of my time!
+
+Background image via [unsplash](https://unsplash.com/)
