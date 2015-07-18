@@ -4,6 +4,7 @@
 ## Setup
 - Git clone repo (or unzip compressed folder) to local machine
 - Open index.html in browser to view map
+- Or simply [view the demo in action](http://jannypie.github.io/d3-force-directed-train-map/)
 
 ## Challenges
 - I had previously worked with d3 for simple plot graphs, pie charts, bar charts
